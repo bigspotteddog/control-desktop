@@ -33,10 +33,12 @@ function App() {
     }
   }
 
-  window.electronAPI.sendScreenId((event, screenId) => {
-    console.log('Renderer...', screenId)
-    getStream(screenId)
-  })
+  if (window.electronAPI && window.electronAPI.sendScreenId) {
+    window.electronAPI.sendScreenId((event, screenId) => {
+      console.log('Renderer...', screenId)
+      getStream(screenId)
+    })
+  }
 
   return (
     <div className="App">
