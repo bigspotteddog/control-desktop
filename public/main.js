@@ -15,6 +15,7 @@ const { screen } = require('electron')
 
 let availableScreens
 let mainWindow
+let clientSelectedScreen
 
 const { createServer } = require('http')
 const { Server} = require('socket.io')
@@ -39,7 +40,7 @@ expressApp.use(function(req, res, next) {
 
 const httpServer = createServer(expressApp)
 httpServer.listen(4000, '0.0.0.0')
-httpServer.on('error', e => console.log('server error'))
+httpServer.on('error', e => console.log(e))
 httpServer.on('listening', () => console.log('listening.....'))
 const io = new Server(httpServer, {
     origin: '*',
@@ -72,26 +73,28 @@ connections.on('connection', socket => {
         socket.broadcast.emit('selectedScreen', clientSelectedScreen)
     })
 
-    socket.on('mouse_move', ({
-        clientX, clientY, clientWidth, clientHeight,
-    }) => {
-        const { displaySize: { width, height }, } = clientSelectedScreen
-        const ratioX = width / clientWidth
-        const ratioY = height / clientHeight
+    // socket.on('mouse_move', ({
+    //     clientX, clientY, clientWidth, clientHeight,
+    // }) => {
+    //     if (clientSelectedScreen) {
+    //       const { displaySize: { width, height }, } = clientSelectedScreen
+    //       const ratioX = width / clientWidth
+    //       const ratioY = height / clientHeight
 
-        const hostX = clientX * ratioX
-        const hostY = clientY * ratioY
+    //       const hostX = clientX * ratioX
+    //       const hostY = clientY * ratioY
+    //     }
 
-        robot.moveMouse(hostX, hostY)
-    })
+    //     robot.moveMouse(hostX, hostY)
+    // })
 
-    socket.on('mouse_click', ({ button }) => {
-        robot.mouseClick('left', false) // true means double-click
-    })
+    // socket.on('mouse_click', ({ button }) => {
+    //     robot.mouseClick('left', false) // true means double-click
+    // })
 })
 
-const sendSelectedScreen = (item) => {
-  mainWindow.webContents.send('SET_SOURCE_ID', item.id)
+const sendSelectedScreen = (source) => {
+  mainWindow.webContents.send('SET_SOURCE_ID', source.id)
 }
 
 const createTray = () => {
@@ -152,13 +155,13 @@ const createWindow = () => {
       sendSelectedScreen(sources[0])
       availableScreens = sources
       createTray()
-      // for (const source of sources) {
-      //   console.log(source.name)
-      //   if (source.name === "Entire screen") {
-      //     mainWindow.webContents.send('SET_SOURCE_ID', source.id)
-      //     return
-      //   }
-      // }
+      for (const source of sources) {
+        console.log(source.name)
+        if (source.name === "Entire screen") {
+          mainWindow.webContents.send('SET_SOURCE_ID', source.id)
+          return
+        }
+      }
     })
   })
 

@@ -10,46 +10,31 @@ function App() {
   const videoRef = useRef()
 
   const rtcPeerConnection = useRef(new RTCPeerConnection({
-    'iceServers': [
-      {url:'stun:stun01.sipphone.com'},
-      {url:'stun:stun.ekiga.net'},
-      {url:'stun:stun.fwdnet.net'},
-      {url:'stun:stun.ideasip.com'},
-      {url:'stun:stun.iptel.org'},
-      {url:'stun:stun.rixtelecom.se'},
-      {url:'stun:stun.schlund.de'},
-      {url:'stun:stun.l.google.com:19302'},
-      {url:'stun:stun1.l.google.com:19302'},
-      {url:'stun:stun2.l.google.com:19302'},
-      {url:'stun:stun3.l.google.com:19302'},
-      {url:'stun:stun4.l.google.com:19302'},
-      {url:'stun:stunserver.org'},
-      {url:'stun:stun.softjoys.com'},
-      {url:'stun:stun.voiparound.com'},
-      {url:'stun:stun.voipbuster.com'},
-      {url:'stun:stun.voipstunt.com'},
-      {url:'stun:stun.voxgratia.org'},
-      {url:'stun:stun.xten.com'},
-      {
-          url: 'turn:numb.viagenie.ca',
-          credential: 'muazkh',
-          username: 'webrtc@live.com'
-      },
-      {
-          url: 'turn:192.158.29.39:3478?transport=udp',
-          credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-          username: '28224511:1379330808'
-      },
-      {
-          url: 'turn:192.158.29.39:3478?transport=tcp',
-          credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-          username: '28224511:1379330808'
-      }
-
-
-      // { 'urls': 'stun:stun:services.mozilla.com' },
-      // { 'urls': 'stun:stun.l.google.com:19302' },
-    ]
+    iceServers: [
+        {
+          urls: "stun:stun.relay.metered.ca:80",
+        },
+        {
+          urls: "turn:a.relay.metered.ca:80",
+          username: "fdf4f82716200f79d95ff3ba",
+          credential: "CXUFaPIbSJOVWMU7",
+        },
+        {
+          urls: "turn:a.relay.metered.ca:80?transport=tcp",
+          username: "fdf4f82716200f79d95ff3ba",
+          credential: "CXUFaPIbSJOVWMU7",
+        },
+        {
+          urls: "turn:a.relay.metered.ca:443",
+          username: "fdf4f82716200f79d95ff3ba",
+          credential: "CXUFaPIbSJOVWMU7",
+        },
+        {
+          urls: "turn:a.relay.metered.ca:443?transport=tcp",
+          username: "fdf4f82716200f79d95ff3ba",
+          credential: "CXUFaPIbSJOVWMU7",
+        },
+    ],
   }))
 
   const [selectedScreen, _setSelectedScreen] = useState(1)
@@ -112,12 +97,10 @@ function App() {
       }
     }
 
-    // (window.electronAPI && window.electronAPI.sendScreenId((event, screenId) => {
-    //   console.log('Renderer...', screenId)
-    //   getStream(screenId)
-    // })) || getUserMedia({ video: true, audio: false })
-
-    getUserMedia({ video: true, audio: false })
+    (window.electronAPI && window.electronAPI.getScreenId((event, screenId) => {
+      console.log('Renderer...', screenId)
+      getStream(screenId)
+    })) || getUserMedia({ video: true, audio: false })
 
     socket.on('offer', offerSDP => {
       console.log('received offer')
